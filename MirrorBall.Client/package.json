@@ -1,0 +1,22 @@
+{
+  "name": "MirrorBall.Client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "watch": "webpack -w",
+    "build": "webpack"
+  },
+  "keywords": [],
+  "author": "Daniel Earwicker <dan@earwicker.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@types/react": "^15.0.33",
+    "@types/react-dom": "^15.5.1",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "ts-loader": "^2.2.0",
+    "typescript": "^2.4.1",
+    "webpack": "^3.0.0"
+  }
+}
