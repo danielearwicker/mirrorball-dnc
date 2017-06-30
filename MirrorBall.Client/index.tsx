@@ -54,7 +54,7 @@ class Issue extends React.Component<MirrorBall.IssueInfo, IssueState> {
                             </div> :
                         this.props.state == MirrorBall.IssueState.Failed ?
                             <div className="error">
-                                <button>Clear</button>
+                                <button onClick={() => this.resolve("")}>Clear</button>
                             </div> :
                         this.props.state == MirrorBall.IssueState.Queued ?
                             <div className="waiting">
@@ -102,11 +102,13 @@ class App extends React.Component<{}, MirrorBallAppState> {
     }
 
     componentDidMount() {
+        this.fetchIssues();
+    }
+
+    refresh = () => {
         fetch("api/mirror/diff", { method: "POST" })
             .then(r => r.text())
             .catch(err => console.error(err));
-
-        this.fetchIssues();
     }
 
     componentWillUnmount() {
@@ -116,6 +118,10 @@ class App extends React.Component<{}, MirrorBallAppState> {
     render() {
         return (
             <div>
+                <div>
+                    <button onClick={this.refresh}>Refresh</button>
+                </div>
+                <hr/>
             {
                 this.state.issues.map(issue => 
                 (
