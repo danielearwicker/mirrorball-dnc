@@ -14,11 +14,6 @@ using System.Diagnostics;
 
 namespace MirrorBall.Server.Controllers
 {
-    public class RenameOperation
-    {
-        public string OldName { get; set; }
-        public string NewName { get; set; }
-    }
 
     [Route("api/[controller]")]
     public class MirrorController : Controller
@@ -37,7 +32,7 @@ namespace MirrorBall.Server.Controllers
 
         private const int ChunkSize = 0x100000;
         private const string OctetStream = "application/octet-stream";
-        private static readonly string[] Units = new[] {"bytes", "KB", "MB", "GB", "TB", "PB"};
+        private static readonly string[] Units = new[] { "bytes", "KB", "MB", "GB", "TB", "PB" };
 
         class CopyProgress
         {
@@ -52,20 +47,20 @@ namespace MirrorBall.Server.Controllers
 
             public string Message(long position)
             {
-				var rate = FormatFileSize(position / _timer.Elapsed.TotalSeconds);
-				return $"{rate}/second, {FormatFileSize(position)} of {FormatFileSize(_size)}";
-			}
+                var rate = FormatFileSize(position / _timer.Elapsed.TotalSeconds);
+                return $"{rate}/second, {FormatFileSize(position)} of {FormatFileSize(_size)}";
+            }
 
-			private static string FormatFileSize(double size)
-			{
-				var unit = 0;
-				while (size > 1024)
-				{
-					unit++;
-					size /= 1024;
-				}
-				return size.ToString("0.##") + " " + Units[unit];
-			}
+            private static string FormatFileSize(double size)
+            {
+                var unit = 0;
+                while (size > 1024)
+                {
+                    unit++;
+                    size /= 1024;
+                }
+                return size.ToString("0.##") + " " + Units[unit];
+            }
         }
 
         private async Task PerformCopy(bool remote, string path, Action<double, string> progress)
@@ -82,8 +77,8 @@ namespace MirrorBall.Server.Controllers
                     var buffer = new byte[ChunkSize];
 
                     var timer = new CopyProgress(length);
-					
-					int got;
+
+                    int got;
                     while ((got = stream.Read(buffer, 0, buffer.Length)) != 0)
                     {
                         var mode = position == 0 ? "truncate" : "append";
@@ -142,8 +137,8 @@ namespace MirrorBall.Server.Controllers
             Console.WriteLine("Finished file copy");
         }
 
-		private async Task PerformDelete(bool remote, string path)
-		{
+        private async Task PerformDelete(bool remote, string path)
+        {
             if (!remote)
             {
                 Delete(path);
@@ -152,96 +147,96 @@ namespace MirrorBall.Server.Controllers
             {
                 await new HttpClient().DeleteAsync($"{_options.PeerServer}api/mirror/length/{path}");
             }
-		}
+        }
 
         private async Task PerformRename(bool remote, string oldPath, string newPath)
         {
-			var op = new RenameOperation
-			{
-				OldName = oldPath,
-				NewName = newPath
+            var op = new RenameOperation
+            {
+                OldName = oldPath,
+                NewName = newPath
             };
 
-			if (!remote)
-			{
+            if (!remote)
+            {
                 Rename(op);
-			}
-			else
-			{                
+            }
+            else
+            {
                 await new HttpClient().PostAsync(
                     $"{_options.PeerServer}api/mirror/rename",
                     new StringContent(
                         JsonConvert.SerializeObject(op),
                         Encoding.UTF8,
                         "application/json"));
-			}
+            }
         }
 
         private void AddExtra(bool remote, string path)
         {
             var location = remote ? _options.PeerName : _options.OurName;
 
-			Operations.AddIssue(new Issue(new IssueInfo
-			{
-				Title = "Extra file",
+            Operations.AddIssue(new Issue(new IssueInfo
+            {
+                Title = "Extra file",
                 Message = $"Only on {location} - {path}",
                 Options = new[] { "Copy", "Delete" }
             },
             (choice, progress) =>
-		    {
+            {
                 return choice == "Copy"
                     ? PerformCopy(remote, path, progress)
                     : PerformDelete(remote, path);
-		    }));
+            }));
         }
 
-		private void AddRename(string leftPath, string rightPath)
-		{
-			Operations.AddIssue(new Issue(new IssueInfo
-			{
-				Title = "Different names/locations",
+        private void AddRename(string leftPath, string rightPath)
+        {
+            Operations.AddIssue(new Issue(new IssueInfo
+            {
+                Title = "Different names/locations",
                 Message = "Select the name to use",
                 Options = new[] { leftPath, rightPath }
-			},
-			(choice, progress) =>
-			{
+            },
+            (choice, progress) =>
+            {
                 return choice == leftPath
                     ? PerformRename(true, rightPath, leftPath)
                     : PerformRename(false, leftPath, rightPath);
-			}));
-		}
+            }));
+        }
 
-		private void AddReplace(string path)
-		{
-			Operations.AddIssue(new Issue(new IssueInfo
-			{
-				Title = "Different contents at the same path",
+        private void AddReplace(string path)
+        {
+            Operations.AddIssue(new Issue(new IssueInfo
+            {
+                Title = "Different contents at the same path",
                 Message = $"Which version of {path}",
                 Options = new[] { _options.PeerName, _options.OurName }
-			},
-			(choice, progress) =>
-			{
+            },
+            (choice, progress) =>
+            {
                 return choice == _options.PeerName
                     ? PerformCopy(true, path, progress)
                     : PerformCopy(false, path, progress);
-			}));
-		}
+            }));
+        }
 
         private async Task Diff(Action<double, string> progress)
         {
-			var rightTask = new HttpClient().GetStringAsync($"{_options.PeerServer}api/mirror/states");
+            var rightTask = new HttpClient().GetStringAsync($"{_options.PeerServer}api/mirror/states");
 
-			var left = Operations.GetStates(_options.RootFolder, progress);
-			var right = JsonConvert.DeserializeObject<List<FileState>>(await rightTask);
+            var left = Operations.GetStates(_options.RootFolder, progress);
+            var right = JsonConvert.DeserializeObject<List<FileState>>(await rightTask);
 
             var leftDuplicates = Operations.FindDuplicates(left);
-			var rightDuplicates = Operations.FindDuplicates(right);
+            var rightDuplicates = Operations.FindDuplicates(right);
 
             AddDuplicates(leftDuplicates);
             AddDuplicates(rightDuplicates);
 
             if (leftDuplicates.Count == 0 && rightDuplicates.Count == 0)
-			{
+            {
                 foreach (var diff in Operations.Compare(left, right))
                 {
                     switch (diff.Type)
@@ -250,33 +245,33 @@ namespace MirrorBall.Server.Controllers
                             AddExtra(false, diff.Left);
                             break;
 
-						case DiffType.RightOnly:
+                        case DiffType.RightOnly:
                             AddExtra(true, diff.Right);
-							break;
+                            break;
 
                         case DiffType.Renamed:
                             AddRename(diff.Left, diff.Right);
                             break;
 
                         case DiffType.Modified:
-							AddReplace(diff.Left);
-							break;
+                            AddReplace(diff.Left);
+                            break;
                     }
                 }
-			}
-		}
+            }
+        }
 
-		[HttpGet("states")]
-		public List<FileState> GetStates()
-		{
-            return Operations.GetStates(_options.RootFolder, (arg1, arg2) => {});
-		}
+        [HttpGet("states")]
+        public List<FileState> GetStates()
+        {
+            return Operations.GetStates(_options.RootFolder, (arg1, arg2) => { });
+        }
 
-		[HttpGet("issues")]
+        [HttpGet("issues")]
         public List<IssueInfo> GetIssues()
-		{
-			return Operations.GetIssues();
-		}
+        {
+            return Operations.GetIssues();
+        }
 
         [HttpPost("resolve")]
         public void PostResolve([FromBody] IssueResolution resolution)
@@ -284,14 +279,14 @@ namespace MirrorBall.Server.Controllers
             Operations.ResolveIssue(resolution);
         }
 
-		[HttpPost("diff")]
+        [HttpPost("diff")]
         public void PostDiff()
         {
             Operations.AddIssue(new Issue(new IssueInfo
             {
                 State = IssueState.Queued,
                 Title = "Refresh",
-                Message = "Comparing files to discover issues"                 
+                Message = "Comparing files to discover issues"
 
             }, (resolution, progress) => Diff(progress)));
         }
@@ -302,10 +297,10 @@ namespace MirrorBall.Server.Controllers
         }
 
         [HttpGet("length/{*path}")]
-		public long GetLength(string path)
-		{
+        public long GetLength(string path)
+        {
             return new FileInfo(GetFullPath(path)).Length;
-		}
+        }
 
         [HttpGet("pull/{start}/{count}/{*path}")]
         public void GetPull(long start, int count, string path)
@@ -329,7 +324,7 @@ namespace MirrorBall.Server.Controllers
 
         [HttpPut("truncate/{*path}")]
         public void PutTruncate(string path)
-        {            
+        {
             Console.WriteLine($"Overwriting {path}");
 
             CreateParentFolders(path);
@@ -337,17 +332,17 @@ namespace MirrorBall.Server.Controllers
             using (var stream = new FileStream(GetFullPath(path), FileMode.Create))
             {
                 Request.Body.CopyTo(stream);
-            }    
+            }
         }
 
-		[HttpPut("append/{*path}")]
-		public void PutAppend(string path)
-		{
+        [HttpPut("append/{*path}")]
+        public void PutAppend(string path)
+        {
             using (var stream = new FileStream(GetFullPath(path), FileMode.Append))
-			{
+            {
                 Request.Body.CopyTo(stream);
-			}
-		}
+            }
+        }
 
         [HttpDelete("delete/{*path}")]
         public void Delete(string path)
@@ -358,15 +353,15 @@ namespace MirrorBall.Server.Controllers
             RemoveEmptyParentFolders(path);
         }
 
-		[HttpPost("rename")]
+        [HttpPost("rename")]
         public void Rename([FromBody] RenameOperation op)
-		{
+        {
             Console.WriteLine($"Renaming {op.OldName} to {op.NewName}");
 
             CreateParentFolders(op.NewName);
             System.IO.File.Move(GetFullPath(op.OldName), GetFullPath(op.NewName));
             RemoveEmptyParentFolders(op.OldName);
-		}
+        }
 
         private void CreateParentFolders(string path)
         {
@@ -378,12 +373,12 @@ namespace MirrorBall.Server.Controllers
             }
             else
             {
-                Console.WriteLine($"Directory {parent} already exists");    
+                Console.WriteLine($"Directory {parent} already exists");
             }
         }
 
-		private void RemoveEmptyParentFolders(string path)
-		{
+        private void RemoveEmptyParentFolders(string path)
+        {
             var parent = Path.GetDirectoryName(GetFullPath(path));
             if (!Directory.EnumerateFileSystemEntries(parent).Any())
             {
@@ -401,6 +396,6 @@ namespace MirrorBall.Server.Controllers
             {
                 Console.WriteLine($"Directory {parent} is not empty");
             }
-		}
+        }
     }
 }

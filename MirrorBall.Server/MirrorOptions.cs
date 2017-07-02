@@ -1,5 +1,4 @@
-﻿using System;
-namespace MirrorBall.Server
+﻿namespace MirrorBall.Server
 {
     public class MirrorOptions
     {
