@@ -2,71 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace MirrorBall.API
 {
-	public enum DiffType
-	{
-		LeftOnly, RightOnly, Renamed, Modified
-	}
-
-	public class Diff
-	{
-		public DiffType Type { get; set; }
-		public string Left { get; set; }
-		public string Right { get; set; }
-	}
-
-	public class FileState
-	{
-		public string Path { get; set; }
-        public string Hash { get; set; }
-		public DateTime Time { get; set; }
-        public long Size { get; set; }
-	}
-
-    public enum IssueState
-    {
-        New,
-        Queued,
-        Busy,
-        Failed
-    }
-
-    public class IssueInfo
-    {
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public string Message { get; set; }
-        public string[] Options { get; set; }
-        public IssueState State { get; set; }
-        public double Progress { get; set; }
-        public string ProgressText { get; set; }
-        public string Choice { get; set; }
-	}
-
-    public class IssueResolution
-    {
-        public int Id { get; set; }
-        public string Choice { get; set; }
-    }
-
-    public class Issue
-    {
-        public IssueInfo Info { get; }
-        public Func<string, Action<double, string>, Task> Resolve { get; }
-
-        public Issue(IssueInfo info,
-                     Func<string, Action<double, string>, Task> resolve)
-        {
-            Info = info;
-            Resolve = resolve;
-        }
-    }
 
     public static class Operations
     {
@@ -95,11 +35,11 @@ namespace MirrorBall.API
 
                     file.Seek(0, SeekOrigin.Begin);
 
-					var got = file.Read(buffer, 0, halfSize);
-					if (got != halfSize)
-					{
-						throw new Exception($"Oi {halfSize} {got}");
-					}
+                    var got = file.Read(buffer, 0, halfSize);
+                    if (got != halfSize)
+                    {
+                        throw new Exception($"Oi {halfSize} {got}");
+                    }
 
                     file.Seek(-halfSize, SeekOrigin.End);
                     if (file.Position != file.Length - halfSize)
@@ -178,10 +118,10 @@ namespace MirrorBall.API
             {
                 var subPath = filePath.Substring(folderPath.Length).Trim(Path.DirectorySeparatorChar);
 
-				count++;
-				progress((double)count / filePaths.Count, subPath);
+                count++;
+                progress((double)count / filePaths.Count, subPath);
 
-				var fileInfo = new FileInfo(filePath);
+                var fileInfo = new FileInfo(filePath);
 
                 FileState fileState;
                 if (!statesByPath.TryGetValue(subPath, out fileState) ||
@@ -197,7 +137,7 @@ namespace MirrorBall.API
                     };
                 }
 
-                newStates.Add(fileState);            
+                newStates.Add(fileState);
             }
 
             File.WriteAllText(stateFilePath,
@@ -209,7 +149,7 @@ namespace MirrorBall.API
         }
 
         public static List<List<FileState>> FindDuplicates(List<FileState> files)
-        {            
+        {
             return files.GroupBy(l => l.Hash).Where(g => g.Count() > 1).Select(g => g.ToList()).ToList();
         }
 
@@ -224,10 +164,10 @@ namespace MirrorBall.API
                 FileState rightState;
                 if (!rightByHash.TryGetValue(leftState.Hash, out rightState))
                 {
-                    diffs.Add(new Diff 
-                    { 
-                        Type = DiffType.LeftOnly, 
-                        Left = leftState.Path 
+                    diffs.Add(new Diff
+                    {
+                        Type = DiffType.LeftOnly,
+                        Left = leftState.Path
                     });
                 }
                 else if (rightState.Path != leftState.Path)
@@ -243,15 +183,15 @@ namespace MirrorBall.API
 
             foreach (var rightState in right)
             {
-				FileState leftState;
-				if (!leftByHash.TryGetValue(rightState.Hash, out leftState))
-				{
-					diffs.Add(new Diff
-					{
-						Type = DiffType.RightOnly,
-						Right = rightState.Path
-					});
-				}
+                FileState leftState;
+                if (!leftByHash.TryGetValue(rightState.Hash, out leftState))
+                {
+                    diffs.Add(new Diff
+                    {
+                        Type = DiffType.RightOnly,
+                        Right = rightState.Path
+                    });
+                }
             }
 
             var leftOnlyByPaths = diffs.Where(d => d.Type == DiffType.LeftOnly)
@@ -298,10 +238,10 @@ namespace MirrorBall.API
                     _issues.Add(issue);
                 }
 
-				if (_issueWorker == null)
-				{
-					_issueWorker = Task.Run(IssueWorker);
-				}
+                if (_issueWorker == null)
+                {
+                    _issueWorker = Task.Run(IssueWorker);
+                }
             }
         }
 
@@ -319,7 +259,7 @@ namespace MirrorBall.API
                     ProgressText = i.Info.ProgressText,
                     Message = i.Info.Message,
                     Choice = i.Info.Choice
-                              
+
                 }).ToList();
             }
         }
@@ -342,7 +282,7 @@ namespace MirrorBall.API
                 }
 
                 if (busy != null)
-                {                    
+                {
                     Console.WriteLine($"{busy.Info.Id}: {busy.Info.Title} - {busy.Info.Message}");
                     Console.WriteLine($"{busy.Info.Id}: choice = {busy.Info.Choice}");
                     try
