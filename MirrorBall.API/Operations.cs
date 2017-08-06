@@ -76,7 +76,7 @@ namespace MirrorBall.API
         {
             byte[] hash;
 
-            using (var hasher = System.Security.Cryptography.SHA512.Create())
+            using (var hasher = SHA512.Create())
             using (var file = File.OpenRead(filePath))
             {
                 hasher.Initialize();

@@ -35,6 +35,8 @@ namespace MirrorBall.Server.Controllers
 
         }
 
+        private static readonly HttpClient Http = new HttpClient();
+
         private const int ChunkSize = 0x100000;
         private const string OctetStream = "application/octet-stream";
         private static readonly string[] Units = new[] {"bytes", "KB", "MB", "GB", "TB", "PB"};
@@ -93,7 +95,7 @@ namespace MirrorBall.Server.Controllers
                         var content = new ByteArrayContent(buffer, 0, got);
                         content.Headers.ContentType = new MediaTypeHeaderValue(OctetStream);
 
-                        var response = await new HttpClient().PutAsync(url, content);
+                        var response = await Http.PutAsync(url, content);
                         if (!response.IsSuccessStatusCode)
                         {
                             throw new Exception($"{response.StatusCode} - {response.ReasonPhrase} [{url}]");
@@ -109,7 +111,7 @@ namespace MirrorBall.Server.Controllers
             {
                 Console.WriteLine($"Pulling remote {path} from peer");
 
-                var length = long.Parse(await new HttpClient().GetStringAsync(
+                var length = long.Parse(await Http.GetStringAsync(
                     $"{_options.PeerServer}api/mirror/length/{path}"));
 
                 Console.WriteLine($"Remote {path} is {length} bytes");
@@ -128,7 +130,7 @@ namespace MirrorBall.Server.Controllers
 
                         var url = $"{_options.PeerServer}api/mirror/pull/{position}/{count}/{path}";
 
-                        var content = await new HttpClient().GetByteArrayAsync(url);
+                        var content = await Http.GetByteArrayAsync(url);
 
                         stream.Write(content, 0, content.Length);
 
@@ -150,7 +152,7 @@ namespace MirrorBall.Server.Controllers
             }
             else
             {
-                await new HttpClient().DeleteAsync($"{_options.PeerServer}api/mirror/length/{path}");
+                await Http.DeleteAsync($"{_options.PeerServer}api/mirror/length/{path}");
             }
 		}
 
@@ -168,7 +170,7 @@ namespace MirrorBall.Server.Controllers
 			}
 			else
 			{                
-                await new HttpClient().PostAsync(
+                await Http.PostAsync(
                     $"{_options.PeerServer}api/mirror/rename",
                     new StringContent(
                         JsonConvert.SerializeObject(op),
@@ -229,7 +231,9 @@ namespace MirrorBall.Server.Controllers
 
         private async Task Diff(Action<double, string> progress)
         {
-			var rightTask = new HttpClient().GetStringAsync($"{_options.PeerServer}api/mirror/states");
+            var uri = $"{_options.PeerServer}api/mirror/states";
+            Console.WriteLine($"Retrieving: {uri}");
+            var rightTask = Http.GetStringAsync(uri);
 
 			var left = Operations.GetStates(_options.RootFolder, progress);
 			var right = JsonConvert.DeserializeObject<List<FileState>>(await rightTask);
