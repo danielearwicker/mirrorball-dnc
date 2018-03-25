@@ -31,7 +31,10 @@ namespace MirrorBall.Server
             var hostName = System.Net.Dns.GetHostName();
             Console.WriteLine($"Hostname is {hostName}");
 
-            services.Configure<MirrorOptions>(Configuration.GetSection(hostName));
+            var options = Configuration.GetSection(hostName);
+            Console.WriteLine(options);
+
+            services.Configure<MirrorOptions>(options);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
