@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace MirrorBall.Server
 {
@@ -32,7 +33,7 @@ namespace MirrorBall.Server
             Console.WriteLine($"Hostname is {hostName}");
 
             var options = Configuration.GetSection(hostName);
-            Console.WriteLine(options);
+            Console.WriteLine(JsonConvert.SerializeObject(options.Get<MirrorOptions>());
 
             services.Configure<MirrorOptions>(options);
         }
