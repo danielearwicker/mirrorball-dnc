@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{D318
 	ProjectSection(SolutionItems) = preProject
 		build.sh = build.sh
 		deploy.sh = deploy.sh
+		run.sh = run.sh
 	EndProjectSection
 EndProject
 Global
