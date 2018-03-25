@@ -26,6 +26,7 @@ namespace MirrorBall.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddOptions();
+            services.AddMvc();
 
             var hostName = System.Net.Dns.GetHostName();
             Console.WriteLine($"Hostname is {hostName}");
