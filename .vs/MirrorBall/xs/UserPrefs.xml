@@ -1,8 +1,9 @@
 ﻿<Properties StartupConfiguration="{87B53186-A693-4EE5-9C06-06DDBE37FD89}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="MirrorBall.Server/Startup.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="MirrorBall.Server/appsettings.json">
     <Files>
       <File FileName="MirrorBall.Server/Startup.cs" Line="36" Column="89" />
       <File FileName="deploy.sh" Line="10" Column="1" />
+      <File FileName="MirrorBall.Server/appsettings.json" Line="13" Column="24" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
