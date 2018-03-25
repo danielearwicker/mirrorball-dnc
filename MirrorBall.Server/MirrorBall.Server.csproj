@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\" />
+    <Folder Include="Models\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,7 +18,4 @@
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="1.1.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\MirrorBall.API\MirrorBall.API.csproj" />
-  </ItemGroup>
 </Project>

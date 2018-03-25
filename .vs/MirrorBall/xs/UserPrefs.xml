@@ -1,7 +1,6 @@
-﻿<Properties StartupConfiguration="{C5EF2B47-4456-4FF8-9030-2E729ECC0D76}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="build.sh">
+﻿<Properties StartupConfiguration="{87B53186-A693-4EE5-9C06-06DDBE37FD89}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="deploy.sh">
     <Files>
-      <File FileName="MirrorBall.Cmd/Program.cs" Line="1" Column="1" />
       <File FileName="MirrorBall.Server/Startup.cs" Line="1" Column="1" />
       <File FileName="MirrorBall.Server/Program.cs" Line="1" Column="1" />
       <File FileName="MirrorBall.Server/MirrorOptions.cs" Line="1" Column="1" />
@@ -13,7 +12,7 @@
       <File FileName="MirrorBall.API/IssueState.cs" Line="7" Column="9" />
       <File FileName="MirrorBall.Server/Controllers/MirrorController.cs" Line="362" Column="14" />
       <File FileName="MirrorBall.Server/Controllers/RenameOperation.cs" Line="9" Column="1" />
-      <File FileName="deploy.sh" Line="6" Column="1" />
+      <File FileName="deploy.sh" Line="10" Column="1" />
       <File FileName="build.sh" Line="6" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
@@ -24,7 +23,7 @@
       <Breakpoint file="/Users/danielearwicker/Projects/MirrorBall/MirrorBall.Cmd/Program.cs" relfile="MirrorBall.Cmd/Program.cs" line="49" column="41" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.ItemProperties.MirrorBall.Server PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.ItemProperties.MirrorBall.Cmd PreferredExecutionTarget="MonoDevelop.Default" />
   <MultiItemStartupConfigurations />
 </Properties>
