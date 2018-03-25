@@ -1,27 +1,14 @@
 ﻿<Properties StartupConfiguration="{87B53186-A693-4EE5-9C06-06DDBE37FD89}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="run.sh">
+  <MonoDevelop.Ide.Workbench ActiveDocument="MirrorBall.Server/Startup.cs">
     <Files>
-      <File FileName="MirrorBall.Server/Startup.cs" Line="29" Column="31" />
-      <File FileName="MirrorBall.Server/Program.cs" Line="1" Column="1" />
-      <File FileName="MirrorBall.Server/MirrorOptions.cs" Line="1" Column="1" />
-      <File FileName="MirrorBall.Server/Models/Diff.cs" Line="1" Column="1" />
-      <File FileName="MirrorBall.Server/Models/DiffType.cs" Line="1" Column="1" />
-      <File FileName="MirrorBall.Server/Models/FileState.cs" Line="1" Column="1" />
-      <File FileName="MirrorBall.Server/Models/IssueInfo.cs" Line="1" Column="1" />
-      <File FileName="MirrorBall.Server/Models/IssueResolution.cs" Line="1" Column="1" />
-      <File FileName="MirrorBall.Server/Models/IssueState.cs" Line="1" Column="1" />
-      <File FileName="MirrorBall.Server/Controllers/MirrorController.cs" Line="362" Column="14" />
-      <File FileName="MirrorBall.Server/Controllers/RenameOperation.cs" Line="9" Column="1" />
+      <File FileName="MirrorBall.Server/Startup.cs" Line="36" Column="89" />
       <File FileName="deploy.sh" Line="10" Column="1" />
-      <File FileName="build.sh" Line="6" Column="1" />
-      <File FileName="MirrorBall.Server/appsettings.json" Line="21" Column="4" />
-      <File FileName="run.sh" Line="2" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="/Users/danielearwicker/Projects/MirrorBall/MirrorBall.Server/Startup.cs" relfile="MirrorBall.Server/Startup.cs" line="33" column="20" />
+      <Breakpoint file="/Users/danielearwicker/Projects/MirrorBall/MirrorBall.Server/Startup.cs" relfile="MirrorBall.Server/Startup.cs" line="34" column="20" />
       <Breakpoint file="/Users/danielearwicker/Projects/MirrorBall/MirrorBall.Cmd/Program.cs" relfile="MirrorBall.Cmd/Program.cs" line="49" column="41" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -33,7 +33,7 @@ namespace MirrorBall.Server
             Console.WriteLine($"Hostname is {hostName}");
 
             var options = Configuration.GetSection(hostName);
-            Console.WriteLine(JsonConvert.SerializeObject(options.Get<MirrorOptions>());
+            Console.WriteLine(JsonConvert.SerializeObject(options.Get<MirrorOptions>()));
 
             services.Configure<MirrorOptions>(options);
         }
