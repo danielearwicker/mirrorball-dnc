@@ -30,7 +30,7 @@ namespace MirrorBall.Server
             services.AddMvc();
 
             var hostName = System.Net.Dns.GetHostName();
-            Console.WriteLine($"Hostname is {hostName}");
+            Console.WriteLine($"Hostname is apparently {hostName}");
 
             var options = Configuration.GetSection(hostName);
             Console.WriteLine(JsonConvert.SerializeObject(options.Get<MirrorOptions>()));
