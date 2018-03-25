@@ -25,9 +25,25 @@ namespace MirrorBall.Server.Controllers
             _options = accessor.Value;
         }
 
-        private void AddDuplicates(List<List<FileState>> duplicates)
+        private void AddDuplicates(List<List<FileState>> duplicates, bool remote)
         {
-
+            foreach (var group in duplicates)
+            {
+                var options = group.Select(i => i.Path).ToArray();
+                Operations.AddIssue(new Issue(new IssueInfo
+                {
+                    Title = "Duplicates",
+                    Message = $"Which location is preferred? Others will be deleted",
+                    Options = options
+                },
+                async (choice, progress) =>
+                {
+                    foreach (var option in options.Where(o => o != choice))
+                    {
+                        await PerformDelete(remote, option);
+                    }
+                }));
+            }
         }
 
         private static readonly HttpClient Http = new HttpClient();
@@ -147,7 +163,7 @@ namespace MirrorBall.Server.Controllers
             }
             else
             {
-                await Http.DeleteAsync($"{_options.PeerServer}api/mirror/length/{path}");
+                await Http.DeleteAsync($"{_options.PeerServer}api/mirror/delete/{path}");
             }
 		}
 
@@ -234,8 +250,10 @@ namespace MirrorBall.Server.Controllers
             var leftDuplicates = Operations.FindDuplicates(left);
             var rightDuplicates = Operations.FindDuplicates(right);
 
-            AddDuplicates(leftDuplicates);
-            AddDuplicates(rightDuplicates);
+            Operations.ClearNonBusy();
+
+            AddDuplicates(leftDuplicates, false);
+            AddDuplicates(rightDuplicates, true);
 
             if (leftDuplicates.Count == 0 && rightDuplicates.Count == 0)
             {

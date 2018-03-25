@@ -1,10 +1,5 @@
-pushd MirrorBall.Server
-dotnet publish -f netcoreapp1.1 -c Release
-pushd bin/Release/netcoreapp1.1/publish
-cp Mirror* /Volumes/danielearwicker/mirrorball/
-cp wwwroot/* /Volumes/danielearwicker/mirrorball/wwwroot/
-cp Mirror* /Volumes/danielearwicker-1/mirrorball/
-cp wwwroot/* /Volumes/danielearwicker-1/mirrorball/wwwroot/
-popd
-popd
-
+git add .
+git commit -m 'Auto deploy'
+git push
+ssh 192.168.1.10 'cd ~/mirrorball && git pull && . build.sh'
+ssh 192.168.1.11 'cd ~/mirrorball && git pull && . build.sh'

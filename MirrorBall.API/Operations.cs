@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -214,6 +215,14 @@ namespace MirrorBall.API
         private static List<Issue> _issues = new List<Issue>();
         private static int _nextIssueId;
         private static Task _issueWorker;
+
+        public static void ClearNonBusy()
+        {
+            lock (_issues)
+            {
+                _issues.RemoveAll(i => i.Info.State != IssueState.Busy);
+            }
+        }
 
         private static bool SimilarIssues(IssueInfo issue1, IssueInfo issue2)
         {

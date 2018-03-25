@@ -2,11 +2,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MirrorBall.Server", "MirrorBall.Server\MirrorBall.Server.csproj", "{87B53186-A693-4EE5-9C06-06DDBE37FD89}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MirrorBall.Server", "MirrorBall.Server\MirrorBall.Server.csproj", "{87B53186-A693-4EE5-9C06-06DDBE37FD89}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MirrorBall.API", "MirrorBall.API\MirrorBall.API.csproj", "{07956862-D6AD-489B-970A-1C164989CDD5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MirrorBall.API", "MirrorBall.API\MirrorBall.API.csproj", "{07956862-D6AD-489B-970A-1C164989CDD5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MirrorBall.Cmd", "MirrorBall.Cmd\MirrorBall.Cmd.csproj", "{C5EF2B47-4456-4FF8-9030-2E729ECC0D76}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MirrorBall.Cmd", "MirrorBall.Cmd\MirrorBall.Cmd.csproj", "{C5EF2B47-4456-4FF8-9030-2E729ECC0D76}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{D318FAF0-60AE-475D-99F7-399979961EFB}"
+	ProjectSection(SolutionItems) = preProject
+		build.sh = build.sh
+		deploy.sh = deploy.sh
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
