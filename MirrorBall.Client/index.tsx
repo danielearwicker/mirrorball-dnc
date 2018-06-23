@@ -1,5 +1,22 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import { summarise } from "./summarise";
+
+function groupBy<T>(ar: T[], keyOf: (i: T) => string) {
+    const groups: { [key: string]: T[] } = {};
+
+    for (const i of ar) {
+        const key = keyOf(i);
+        (groups[key] || (groups[key] = [])).push(i);
+    }
+
+    return Object.keys(groups).map(key => ({ key, items: groups[key] }));
+}
+
+function flatMap<T, R>(ar: T[], mapping: (i: T) => R[]): R[] {
+    return ar.map(mapping).reduce((l, r) => l.concat(r));
+}
+
 
 interface IssueState {
     resolving: boolean;
@@ -77,12 +94,18 @@ class Issue extends React.Component<MirrorBall.IssueInfo, IssueState> {
 interface IssueGroupProps {
     title: string;
     issues: MirrorBall.IssueInfo[];
+    options: string[];
 }
 
-function IssueGroup({title, issues}: IssueGroupProps) {
+function IssueGroup({title, issues, options}: IssueGroupProps) {
     return (
         <div className="group">
             <h2>{title}</h2>
+            {
+                options.map(option => (
+                    <button>{option}</button>
+                ))
+            }
             {
                 issues.map(issue => (
                     <Issue key={issue.id} {...issue}></Issue>                    
@@ -149,17 +172,20 @@ class App extends React.Component<{}, MirrorBallAppState> {
         ));
     }
 
-    get groups() {
-        const groups: IssueGroupProps[] = [];
-        for (const i of this.foundIssues) {
-            let group = groups.find(g => g.title === i.title);
-            if (!group) {
-                group = { title: i.title, issues: [] };
-                groups.push(group);
+    get groups(): IssueGroupProps[] {
+        return groupBy(this.foundIssues, i => i.title).map(g => { 
+
+            const maxOptions = g.items.map(i => i.options.length).reduce((l, r) => Math.max(l, r));
+            
+            const options: string[] = [];
+            
+            for (let n = 0; n <= maxOptions; n++) {
+                const summary = summarise(g.items.map(i => i.options[n]));
+                options.push(summary.map(s => s.length == 1 ? s : "...").join(""));
             }
-            group.issues.push(i);
-        }
-        return groups;
+            
+            return { title: g.key, issues: g.items, options };
+        });
     }
 
     render() {
