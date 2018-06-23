@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { summarise } from "./summarise";
+import { summariseToString } from "./summarise";
 
 function groupBy<T>(ar: T[], keyOf: (i: T) => string) {
     const groups: { [key: string]: T[] } = {};
@@ -175,8 +175,7 @@ class App extends React.Component<{}, MirrorBallAppState> {
             const options: string[] = [];
             
             for (let n = 0; n <= maxOptions; n++) {
-                const summary = summarise(g.items.map(i => i.options[n] || ""));
-                options.push(summary.map(s => s.length == 1 ? s : "...").join(""));
+                options.push(summariseToString(g.items.map(i => i.options[n] || "")));
             }
             
             return { title: g.key, issues: g.items, options };

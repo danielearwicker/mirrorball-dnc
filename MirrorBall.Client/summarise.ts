@@ -54,3 +54,24 @@ export function summarise(strings: string[]) {
     // No common substring found
     return [strings];
 }
+
+const digits = /^\d+$/;
+const alpha = /^\w+$/;
+
+export function describeSection(strings: string[]) {
+    
+    if (strings.every(s => !s || !!s.match(digits))) {
+        return "[0-9]";
+    }
+
+    if (strings.every(s => !s || !!s.match(alpha))) {
+        return "[a-z]";
+    }
+
+    return "[...]";
+}
+
+export function summariseToString(strings: string[]) {
+    return summarise(strings).map(s => s.length == 1 ? s : describeSection(s)).join("");
+}
+
