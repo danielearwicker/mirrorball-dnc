@@ -174,7 +174,7 @@ class App extends React.Component<{}, MirrorBallAppState> {
             
             const options: string[] = [];
             
-            for (let n = 0; n <= maxOptions; n++) {
+            for (let n = 0; n < maxOptions; n++) {
                 options.push(summariseToString(g.items.map(i => i.options[n] || "")));
             }
             
