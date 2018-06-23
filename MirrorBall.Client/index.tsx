@@ -13,11 +13,6 @@ function groupBy<T>(ar: T[], keyOf: (i: T) => string) {
     return Object.keys(groups).map(key => ({ key, items: groups[key] }));
 }
 
-function flatMap<T, R>(ar: T[], mapping: (i: T) => R[]): R[] {
-    return ar.map(mapping).reduce((l, r) => l.concat(r));
-}
-
-
 interface IssueState {
     resolving: boolean;
 }
