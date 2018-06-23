@@ -64,10 +64,10 @@ class Issue extends React.Component<MirrorBall.IssueInfo, IssueState> {
                             <div className="error">
                                 <button onClick={() => this.resolve("")}>Clear</button>
                             </div> :
-                        // this.props.state == MirrorBall.IssueState.Queued ?
-                        //     <div className="waiting">
-                        //         Queued...
-                        //     </div> :
+                        this.props.state == MirrorBall.IssueState.Queued ?
+                            <div className="waiting">
+                                Queued...
+                            </div> :
                         this.props.state == MirrorBall.IssueState.Busy ?
                             <div>
                                 <div className="progress">
@@ -159,11 +159,10 @@ class App extends React.Component<{}, MirrorBallAppState> {
     }
 
     get foundIssues() {
+        const issues = this.state.issues.filter(i => i.state != MirrorBall.IssueState.Queued);
+
         const s = this.state.search.trim().toLowerCase();
-        if (!s) {
-            return this.state.issues;
-        }
-        return this.state.issues.filter(i => (
+        return !s ? issues : issues.filter(i => (
             i.message.toLowerCase().indexOf(s) !== -1 ||
             i.options.some(o => o.toLowerCase().indexOf(s) !== -1)
         ));
