@@ -76,6 +76,7 @@ class Issue extends React.Component<MirrorBall.IssueInfo, IssueState> {
 
 interface MirrorBallAppState {
     issues: MirrorBall.IssueInfo[];
+    search: string;
 }
 
 class App extends React.Component<{}, MirrorBallAppState> {
@@ -84,7 +85,7 @@ class App extends React.Component<{}, MirrorBallAppState> {
 
     constructor(props: {}) {
         super(props);
-        this.state = { issues: [] };
+        this.state = { issues: [], search: "" };
     }
 
     fetchIssues() {
@@ -115,16 +116,33 @@ class App extends React.Component<{}, MirrorBallAppState> {
         this.quit = true;
     }
 
+    searchChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
+        this.setState({ search: e.target.value });
+    }
+
+    get foundIssues() {
+        const s = this.state.search.trim();
+        if (!s) {
+            return this.state.issues;
+        }
+        return this.state.issues.filter(i => (
+            i.message.indexOf(s) !== -1 ||
+            i.options.some(o => o.indexOf(s) !== -1)
+        ));
+    }
+
     render() {
         return (
             <div>
                 <div>
                     <button onClick={this.refresh}>Refresh</button>
                 </div>
+                <div>
+                    <input type="text" value={this.state.search} onChange={this.searchChanged} />
+                </div>
                 <hr/>
             {
-                this.state.issues.map(issue => 
-                (
+                this.foundIssues.map(issue => (
                     <Issue key={issue.id} {...issue}></Issue>                    
                 ))
             }

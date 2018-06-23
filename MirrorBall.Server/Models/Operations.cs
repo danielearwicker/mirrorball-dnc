@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 
 namespace MirrorBall.API
 {
-
     public static class Operations
     {
         public static int SampleSize = 1024 * 1024;

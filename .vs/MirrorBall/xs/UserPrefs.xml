@@ -1,9 +1,19 @@
 ﻿<Properties StartupConfiguration="{87B53186-A693-4EE5-9C06-06DDBE37FD89}|Default">
-  <MonoDevelop.Ide.Workbench ActiveDocument="MirrorBall.Server/appsettings.json">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../corefx/src/System.Linq/src/System/Linq/ToCollection.cs">
     <Files>
-      <File FileName="MirrorBall.Server/Startup.cs" Line="36" Column="89" />
+      <File FileName="MirrorBall.Server/Startup.cs" Line="33" Column="55" />
       <File FileName="deploy.sh" Line="10" Column="1" />
-      <File FileName="MirrorBall.Server/appsettings.json" Line="13" Column="24" />
+      <File FileName="MirrorBall.Server/appsettings.json" Line="16" Column="12" />
+      <File FileName="run.sh" Line="7" Column="1" />
+      <File FileName="build.sh" Line="6" Column="1" />
+      <File FileName="MirrorBall.Server/Models/Operations.cs" Line="19" Column="49" />
+      <File FileName="MirrorBall.Server/Models/FileState.cs" Line="13" Column="1" />
+      <File FileName="../corefx/CONTRIBUTING.md" Line="1" Column="1" />
+      <File FileName="../corefx/Documentation/README.md" Line="28" Column="43" />
+      <File FileName="../corefx/Documentation/project-docs/developer-guide.md" Line="86" Column="13" />
+      <File FileName="../corefx/src/System.Linq/src/System/Linq/Count.cs" Line="29" Column="41" />
+      <File FileName="../corefx/src/System.Linq/src/System/Linq/Concat.cs" Line="369" Column="77" />
+      <File FileName="../corefx/src/System.Linq/src/System/Linq/ToCollection.cs" Line="30" Column="30" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
