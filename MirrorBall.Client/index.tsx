@@ -192,6 +192,7 @@ class App extends React.Component<{}, MirrorBallAppState> {
                     <button onClick={this.refresh}>Refresh</button>
                     <span> Search </span>
                     <input type="text" value={this.state.search} onChange={this.searchChanged} />
+                    <span> {this.state.issues.filter(i => i.state === MirrorBall.IssueState.Queued).length} in queue</span>
                 </div>
                 <hr/>
             {
