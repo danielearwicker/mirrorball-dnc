@@ -17,6 +17,19 @@ interface IssueState {
     resolving: boolean;
 }
 
+function resolve(id: number, choice: string) {
+
+    const request = { 
+        method: "POST", 
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify({ id, choice })
+    };
+
+    fetch("api/mirror/resolve", request)
+        .then(r => r.text())
+        .catch(err => console.error(err));
+}
+
 class Issue extends React.Component<MirrorBall.IssueInfo, IssueState> {
 
     constructor(props: MirrorBall.IssueInfo) {
@@ -25,25 +38,8 @@ class Issue extends React.Component<MirrorBall.IssueInfo, IssueState> {
     }
 
     resolve(choice: string) {
-
-        const request = { 
-            method: "POST", 
-            headers: {
-                "Content-type": "application/json"
-            },
-            body: JSON.stringify({
-                id: this.props.id,
-                choice
-            })
-        };
-
-        this.setState({ resolving: true });
-
-        fetch("api/mirror/resolve", request)
-            .then(r => r.text())
-            .catch(err => console.error(err))
-            .then(() => this.setState({ resolving: false }));
-    }
+        resolve(this.props.id, choice);
+    }    
 
     render() {        
         return (
@@ -86,6 +82,12 @@ class Issue extends React.Component<MirrorBall.IssueInfo, IssueState> {
     }
 }
 
+async function resolveAll(issues: MirrorBall.IssueInfo[], choice: string) {
+    for (const issue of issues) {
+        await resolve(issue.id, choice);
+    }
+}
+
 interface IssueGroupProps {
     title: string;
     issues: MirrorBall.IssueInfo[];
@@ -98,7 +100,7 @@ function IssueGroup({title, issues, options}: IssueGroupProps) {
             <h2>{title}</h2>
             {
                 options.map(option => (
-                    <button>{option}</button>
+                    <button onClick={() => resolveAll(issues, option)}>{option}</button>
                 ))
             }
             {
