@@ -64,10 +64,10 @@ class Issue extends React.Component<MirrorBall.IssueInfo, IssueState> {
                             <div className="error">
                                 <button onClick={() => this.resolve("")}>Clear</button>
                             </div> :
-                        this.props.state == MirrorBall.IssueState.Queued ?
-                            <div className="waiting">
-                                Queued...
-                            </div> :
+                        // this.props.state == MirrorBall.IssueState.Queued ?
+                        //     <div className="waiting">
+                        //         Queued...
+                        //     </div> :
                         this.props.state == MirrorBall.IssueState.Busy ?
                             <div>
                                 <div className="progress">
@@ -83,7 +83,7 @@ class Issue extends React.Component<MirrorBall.IssueInfo, IssueState> {
 }
 
 async function resolveAll(issues: MirrorBall.IssueInfo[], choice: string) {
-    for (const issue of issues) {
+    for (const issue of issues.filter(i => i.state == MirrorBall.IssueState.New)) {
         await resolve(issue.id, choice);
     }
 }
