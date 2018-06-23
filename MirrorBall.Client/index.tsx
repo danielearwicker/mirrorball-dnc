@@ -74,6 +74,24 @@ class Issue extends React.Component<MirrorBall.IssueInfo, IssueState> {
     }
 }
 
+interface IssueGroupProps {
+    title: string;
+    issues: MirrorBall.IssueInfo[];
+}
+
+function IssueGroup({title, issues}: IssueGroupProps) {
+    return (
+        <div className="group">
+            <h2>{title}</h2>
+            {
+                issues.map(issue => (
+                    <Issue key={issue.id} {...issue}></Issue>                    
+                ))
+            }
+        </div>
+    );
+}
+
 interface MirrorBallAppState {
     issues: MirrorBall.IssueInfo[];
     search: string;
@@ -131,20 +149,30 @@ class App extends React.Component<{}, MirrorBallAppState> {
         ));
     }
 
+    get groups() {
+        const groups: IssueGroupProps[] = [];
+        for (const i of this.foundIssues) {
+            let group = groups.find(g => g.title === i.title);
+            if (!group) {
+                group = { title: i.title, issues: [] };
+                groups.push(group);
+            }
+            group.issues.push(i);
+        }
+        return groups;
+    }
+
     render() {
         return (
             <div>
                 <div>
                     <button onClick={this.refresh}>Refresh</button>
-                </div>
-                <div>
+                    <span> Search </span>
                     <input type="text" value={this.state.search} onChange={this.searchChanged} />
                 </div>
                 <hr/>
             {
-                this.foundIssues.map(issue => (
-                    <Issue key={issue.id} {...issue}></Issue>                    
-                ))
+                this.groups.map(g => <IssueGroup {...g} key={g.title} />)
             }
             </div>
         );
