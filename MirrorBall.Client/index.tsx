@@ -172,8 +172,10 @@ class App extends React.Component<{}, MirrorBallAppState> {
     get groups(): IssueGroupProps[] {
         return groupBy(this.foundIssues, i => i.title).map(g => { 
 
-            const maxOptions = g.items.map(i => i.options.length).reduce((l, r) => Math.max(l, r));
-            
+            const maxOptions = g.items.filter(i => i.state == MirrorBall.IssueState.New)
+                                      .map(i => i.options.length)
+                                      .reduce((l, r) => Math.max(l, r), 0);
+
             const options: string[] = [];
             
             for (let n = 0; n < maxOptions; n++) {
