@@ -159,13 +159,13 @@ class App extends React.Component<{}, MirrorBallAppState> {
     }
 
     get foundIssues() {
-        const s = this.state.search.trim();
+        const s = this.state.search.trim().toLowerCase();
         if (!s) {
             return this.state.issues;
         }
         return this.state.issues.filter(i => (
-            i.message.indexOf(s) !== -1 ||
-            i.options.some(o => o.indexOf(s) !== -1)
+            i.message.toLowerCase().indexOf(s) !== -1 ||
+            i.options.some(o => o.toLowerCase().indexOf(s) !== -1)
         ));
     }
 
