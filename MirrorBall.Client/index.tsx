@@ -188,7 +188,7 @@ class App extends React.Component<{}, MirrorBallAppState> {
     render() {
         return (
             <div>
-                <div>
+                <div className="header">
                     <button onClick={this.refresh}>Refresh</button>
                     <span> Search </span>
                     <input type="text" value={this.state.search} onChange={this.searchChanged} />
