@@ -93,7 +93,6 @@ namespace MirrorBall.Server.Controllers
                     var position = 0L;
 
                     var buffer = new byte[ChunkSize];
-
                     var timer = new CopyProgress(length);
 
                     int got;
@@ -106,7 +105,7 @@ namespace MirrorBall.Server.Controllers
                         var content = new ByteArrayContent(buffer, 0, got);
                         content.Headers.ContentType = new MediaTypeHeaderValue(OctetStream);
 
-                        var response = await Http.PutAsync(url, content);
+                        var response = await Operations.Retry(50, () => Http.PutAsync(url, content));
                         if (!response.IsSuccessStatusCode)
                         {
                             throw new Exception($"{response.StatusCode} - {response.ReasonPhrase} [{url}]");
@@ -122,9 +121,12 @@ namespace MirrorBall.Server.Controllers
             {
                 Console.WriteLine($"Pulling remote {path} from peer");
 
-                var length = long.Parse(await Http.GetStringAsync(
-                    $"{_options.PeerServer}api/mirror/length/{path}"));
-
+                var length = long.Parse(
+                    await Operations.Retry(50, () => 
+                        Http.GetStringAsync($"{_options.PeerServer}api/mirror/length/{path}")
+                    )
+                );
+                    
                 Console.WriteLine($"Remote {path} is {length} bytes");
 
                 var position = 0L;
@@ -141,7 +143,7 @@ namespace MirrorBall.Server.Controllers
 
                         var url = $"{_options.PeerServer}api/mirror/pull/{position}/{count}/{path}";
 
-                        var content = await Http.GetByteArrayAsync(url);
+                        var content = await Operations.Retry(50, () => Http.GetByteArrayAsync(url));
 
                         stream.Write(content, 0, content.Length);
 

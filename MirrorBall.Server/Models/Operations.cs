@@ -356,5 +356,23 @@ namespace MirrorBall.API
                 }
             }
         }
+
+        public static async Task<T> Retry<T>(int attempts, Func<Task<T>> operation)
+        {
+            while (--attempts > 0)
+            {
+                try
+                {
+                    return await operation();
+                }
+                catch (Exception x)
+                {
+                    Console.WriteLine($"Failed with {x.Message}, {attempts} attempts remaining");
+                    await Task.Delay(3000);
+                }
+            }
+
+            return await operation();
+        }
     }
 }
