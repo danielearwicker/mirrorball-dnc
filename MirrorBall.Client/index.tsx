@@ -99,7 +99,7 @@ function IssueGroup({title, issues, options}: IssueGroupProps) {
         <div className="group">
             <h2>{title}</h2>
             {
-                options.map(((option, i) => (
+                options.map((option, i) => (
                     <button onClick={() => resolveAll(issues, i)}>{option}</button>
                 ))
             }
