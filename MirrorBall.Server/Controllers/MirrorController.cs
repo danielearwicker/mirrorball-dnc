@@ -220,9 +220,9 @@ namespace MirrorBall.Server.Controllers
             },
             (choice, progress) =>
             {
-                return choice == leftPath
-                    ? PerformRename(true, rightPath, leftPath)
-                    : PerformRename(false, leftPath, rightPath);
+                return choice == leftPath ? PerformRename(true, rightPath, leftPath) :
+                    choice == rightPath ? PerformRename(false, leftPath, rightPath) :
+                    throw new InvalidOperationException($"Not a valid choice: {choice}");
             }));
         }
 
