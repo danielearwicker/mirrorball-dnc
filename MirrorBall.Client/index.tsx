@@ -82,9 +82,9 @@ class Issue extends React.Component<MirrorBall.IssueInfo, IssueState> {
     }
 }
 
-async function resolveAll(issues: MirrorBall.IssueInfo[], choice: string) {
+async function resolveAll(issues: MirrorBall.IssueInfo[], choice: number) {
     for (const issue of issues.filter(i => i.state == MirrorBall.IssueState.New)) {
-        await resolve(issue.id, choice);
+        await resolve(issue.id, issue.options[choice]);
     }
 }
 
@@ -99,8 +99,8 @@ function IssueGroup({title, issues, options}: IssueGroupProps) {
         <div className="group">
             <h2>{title}</h2>
             {
-                options.map(option => (
-                    <button onClick={() => resolveAll(issues, option)}>{option}</button>
+                options.map(((option, i) => (
+                    <button onClick={() => resolveAll(issues, i)}>{option}</button>
                 ))
             }
             {
