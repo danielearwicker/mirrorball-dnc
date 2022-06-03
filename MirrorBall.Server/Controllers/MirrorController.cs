@@ -1,14 +1,8 @@
-﻿﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using MirrorBall.API;
+﻿﻿using MirrorBall.API;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Net.Http;
-using Newtonsoft.Json;
-using System.Threading.Tasks;
 using System.Text;
-using System.Linq;
+using System.Text.Json;
 using System.Net.Http.Headers;
 using System.Diagnostics;
 
@@ -186,7 +180,7 @@ namespace MirrorBall.Server.Controllers
                 await Http.PostAsync(
                     $"{_options.PeerServer}api/mirror/rename",
                     new StringContent(
-                        JsonConvert.SerializeObject(op),
+                        JsonSerializer.Serialize(op),
                         Encoding.UTF8,
                         "application/json"));
             }
@@ -247,7 +241,7 @@ namespace MirrorBall.Server.Controllers
             var rightTask = Http.GetStringAsync($"{_options.PeerServer}api/mirror/states");
 
 			var left = Operations.GetStates(_options.RootFolder, progress);
-			var right = JsonConvert.DeserializeObject<List<FileState>>(await rightTask);
+			var right = JsonSerializer.Deserialize<List<FileState>>(await rightTask, Operations.JsonOptions);
 
             var leftDuplicates = Operations.FindDuplicates(left);
             var rightDuplicates = Operations.FindDuplicates(right);

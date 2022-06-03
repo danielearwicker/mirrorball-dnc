@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using System.Security.Cryptography;
+using System.Text.Json;
 
 namespace MirrorBall.API
 {
@@ -80,6 +75,8 @@ namespace MirrorBall.API
             }
         }
 
+        public static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+
         public static List<FileState> GetStates(string folderPath, Action<double, string> progress)
         {
             Console.WriteLine($"Loading states {folderPath}");
@@ -92,8 +89,9 @@ namespace MirrorBall.API
             {
                 try
                 {
-                    states = JsonConvert.DeserializeObject<List<FileState>>(
-                       File.ReadAllText(stateFilePath));
+                    states = JsonSerializer.Deserialize<List<FileState>>(
+                       File.ReadAllText(stateFilePath),
+                       JsonOptions)!;
                 }
                 catch (Exception) { }
             }
@@ -141,7 +139,7 @@ namespace MirrorBall.API
             }
 
             File.WriteAllText(stateFilePath,
-                JsonConvert.SerializeObject(newStates, Formatting.Indented));
+                JsonSerializer.Serialize(newStates, new JsonSerializerOptions { WriteIndented = true }));
 
             Console.WriteLine($"Finished loading states {folderPath}");
 
