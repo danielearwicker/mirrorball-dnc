@@ -13,8 +13,6 @@ using System.Net.Http.Headers;
 using System.Diagnostics;
 using FileIO = System.IO.File;
 using System.Threading;
-using System.Net;
-using Microsoft.AspNetCore.Mvc.TagHelpers;
 
 namespace MirrorBall.Server.Controllers
 {
