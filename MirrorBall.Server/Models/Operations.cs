@@ -230,7 +230,7 @@ namespace MirrorBall.API
                    issue1.Options.OrderBy(o => o).SequenceEqual(issue2.Options.OrderBy(o => o));
         }
 
-        public static void AddIssue(Issue issue)
+        public static int AddIssue(Issue issue)
         {
             issue.Info.Id = _nextIssueId++;
 
@@ -246,11 +246,10 @@ namespace MirrorBall.API
                     _issues.Add(issue);
                 }
 
-                if (_issueWorker == null)
-                {
-                    _issueWorker = Task.Run(IssueWorker);
-                }
+                _issueWorker ??= Task.Run(IssueWorker);
             }
+
+            return issue.Info.Id;
         }
 
         public static List<IssueInfo> GetIssues()
@@ -266,7 +265,8 @@ namespace MirrorBall.API
                     Progress = i.Info.Progress,
                     ProgressText = i.Info.ProgressText,
                     Message = i.Info.Message,
-                    Choice = i.Info.Choice
+                    Choice = i.Info.Choice,
+                    DelogoPath = i.Info.DelogoPath
 
                 }).ToList();
             }

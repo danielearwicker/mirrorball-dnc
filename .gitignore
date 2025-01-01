@@ -42,3 +42,7 @@ Thumbs.db
 
 # dotCover
 *.dotCover
+
+.parcel-cache
+**/wwwroot/*.js
+**/wwwroot/*.js.map

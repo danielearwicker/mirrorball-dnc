@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.IO;
 using System.Collections.Generic;
 using MirrorBall.API;
@@ -11,20 +11,17 @@ using System.Text;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Diagnostics;
+using FileIO = System.IO.File;
+using System.Threading;
+using System.Net;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 
 namespace MirrorBall.Server.Controllers
 {
 
     [Route("api/[controller]")]
-    public class MirrorController : Controller
-    {
-        private readonly MirrorOptions _options;
-
-        public MirrorController(IOptions<MirrorOptions> accessor)
-        {
-            _options = accessor.Value;
-        }
-
+    public class MirrorController(IOptions<MirrorOptions> options) : Controller
+    {        
         private void AddDuplicates(List<List<FileState>> duplicates, bool remote)
         {
             foreach (var group in duplicates)
@@ -100,7 +97,7 @@ namespace MirrorBall.Server.Controllers
                     {
                         var mode = position == 0 ? "truncate" : "append";
 
-                        var url = $"{_options.PeerServer}api/mirror/{mode}/{path}";
+                        var url = $"{options.Value.PeerServer}api/mirror/{mode}/{path}";
 
                         var content = new ByteArrayContent(buffer, 0, got);
                         content.Headers.ContentType = new MediaTypeHeaderValue(OctetStream);
@@ -123,7 +120,7 @@ namespace MirrorBall.Server.Controllers
 
                 var length = long.Parse(
                     await Operations.Retry(50, () => 
-                        Http.GetStringAsync($"{_options.PeerServer}api/mirror/length/{path}")
+                        Http.GetStringAsync($"{options.Value.PeerServer}api/mirror/length/{path}")
                     )
                 );
                     
@@ -141,7 +138,7 @@ namespace MirrorBall.Server.Controllers
                     {
                         var count = Math.Min(length, position + ChunkSize) - position;
 
-                        var url = $"{_options.PeerServer}api/mirror/pull/{position}/{count}/{path}";
+                        var url = $"{options.Value.PeerServer}api/mirror/pull/{position}/{count}/{path}";
 
                         var content = await Operations.Retry(50, () => Http.GetByteArrayAsync(url));
 
@@ -165,7 +162,7 @@ namespace MirrorBall.Server.Controllers
             }
             else
             {
-                await Http.DeleteAsync($"{_options.PeerServer}api/mirror/delete/{path}");
+                await Http.DeleteAsync($"{options.Value.PeerServer}api/mirror/delete/{path}");
             }
 		}
 
@@ -182,25 +179,35 @@ namespace MirrorBall.Server.Controllers
                 Rename(op);
 			}
 			else
-			{                
-                await Http.PostAsync(
-                    $"{_options.PeerServer}api/mirror/rename",
-                    new StringContent(
-                        JsonConvert.SerializeObject(op),
-                        Encoding.UTF8,
-                        "application/json"));
+			{
+                Console.WriteLine($"Requesting remote rename: {op.OldName} to {op.NewName}");
+
+                try
+                {
+                    await Http.PostAsync(
+                        $"{options.Value.PeerServer}api/mirror/rename",
+                        new StringContent(
+                            JsonConvert.SerializeObject(op),
+                            Encoding.UTF8,
+                            "application/json"));
+                }
+                catch(Exception x)
+                {
+                    Console.WriteLine(x.GetBaseException().Message);
+                }
             }
         }
 
         private void AddExtra(bool remote, string path)
         {
-            var location = remote ? _options.PeerName : _options.OurName;
+            var location = remote ? options.Value.PeerName : options.Value.OurName;
 
             Operations.AddIssue(new Issue(new IssueInfo
             {
                 Title = "Extra file",
                 Message = $"Only on {location} - {path}",
-                Options = new[] { "Copy", "Delete" }
+                Options = new[] { "Copy", "Delete" },
+                DelogoPath = path,
             },
             (choice, progress) =>
             {
@@ -232,11 +239,11 @@ namespace MirrorBall.Server.Controllers
             {
                 Title = "Different contents at the same path",
                 Message = $"Which version of {path}",
-                Options = new[] { _options.PeerName, _options.OurName }
+                Options = new[] { options.Value.PeerName, options.Value.OurName }
             },
             (choice, progress) =>
             {
-                return choice == _options.PeerName
+                return choice == options.Value.PeerName
                     ? PerformCopy(true, path, progress)
                     : PerformCopy(false, path, progress);
             }));
@@ -244,9 +251,9 @@ namespace MirrorBall.Server.Controllers
 
         private async Task Diff(Action<double, string> progress)
         {
-            var rightTask = Http.GetStringAsync($"{_options.PeerServer}api/mirror/states");
+            var rightTask = Http.GetStringAsync($"{options.Value.PeerServer}api/mirror/states");
 
-			var left = Operations.GetStates(_options.RootFolder, progress);
+			var left = Operations.GetStates(options.Value.RootFolder, progress);
 			var right = JsonConvert.DeserializeObject<List<FileState>>(await rightTask);
 
             var leftDuplicates = Operations.FindDuplicates(left);
@@ -286,7 +293,7 @@ namespace MirrorBall.Server.Controllers
         [HttpGet("states")]
         public List<FileState> GetStates()
         {
-            return Operations.GetStates(_options.RootFolder, (arg1, arg2) => { });
+            return Operations.GetStates(options.Value.RootFolder, (arg1, arg2) => { });
         }
 
         [HttpGet("issues")]
@@ -315,7 +322,7 @@ namespace MirrorBall.Server.Controllers
 
         private string GetFullPath(string path)
         {
-            return Path.Combine(_options.RootFolder, path);
+            return Path.Combine(options.Value.RootFolder, path);
         }
 
         [HttpGet("length/{*path}")]
@@ -371,7 +378,7 @@ namespace MirrorBall.Server.Controllers
         {
             Console.WriteLine($"Deleting file {path}");
 
-            System.IO.File.Delete(GetFullPath(path));
+            FileIO.Delete(GetFullPath(path));
             RemoveEmptyParentFolders(path);
         }
 
@@ -381,8 +388,115 @@ namespace MirrorBall.Server.Controllers
             Console.WriteLine($"Renaming {op.OldName} to {op.NewName}");
 
             CreateParentFolders(op.NewName);
-            System.IO.File.Move(GetFullPath(op.OldName), GetFullPath(op.NewName));
+            FileIO.Move(GetFullPath(op.OldName), GetFullPath(op.NewName));
             RemoveEmptyParentFolders(op.OldName);
+        }
+
+        private async Task Ffmpeg(string[] args, Action<string> stdout)
+        {
+            var info = new ProcessStartInfo
+            {
+                FileName = options.Value.Ffmpeg,
+                RedirectStandardOutput = true,
+            };
+
+            foreach (var arg in args)
+            {
+                info.ArgumentList.Add(arg);
+            }
+
+            using var proc = Process.Start(info);
+
+            var quit = new CancellationTokenSource();
+            var quitToken = quit.Token;
+
+            var reader = Task.Run(async () =>
+            {
+                try
+                {
+                    while (!quitToken.IsCancellationRequested)
+                    {
+                        var line = await proc.StandardOutput.ReadLineAsync(quitToken);
+                        if (line == null) break;
+
+                        line = line.Trim();
+                        if (line != string.Empty) stdout(line);
+                    }
+                }
+                catch(Exception x)
+                {
+                    Console.WriteLine("Leaving stdout reader: " + 
+                        x.GetBaseException().Message);
+                }
+            });
+
+            await proc.WaitForExitAsync();
+
+            quit.Cancel();
+
+            await reader;
+        }
+
+        [HttpGet("thumbnail/{*path}")]
+        public async Task<IActionResult> GetThumbnail(string path)
+        {
+            Console.WriteLine($"Generating thumbnail for {path}");
+
+            var tempPath = Path.Combine(
+                Path.GetTempPath(), 
+                Guid.NewGuid().ToString());
+
+            try
+            {
+                await Ffmpeg([
+                    "-i", GetFullPath(path),
+                    "-ss", "00:02:00.00",
+                    "-vframes:v", "1",
+                    $"{tempPath}-%03d.png"],
+                    x => Console.WriteLine(x));
+
+                var bytes = FileIO.ReadAllBytes($"{tempPath}-001.png");
+
+                return new FileStreamResult(new MemoryStream(bytes), "image/png");
+            }
+            finally
+            {
+                FileIO.Delete($"{tempPath}-001.png");
+            }            
+        }
+
+        [HttpPost("delogo")]
+        public void DeLogo([FromBody] DelogoOperation op)
+        {
+            var fullPath = GetFullPath(op.Path);
+
+            Console.WriteLine("fullPath:" + fullPath);
+
+            Operations.AddIssue(new Issue(new IssueInfo
+            {
+                Title = "De-logo",
+                Message = op.Path,
+                Options = [],
+                State = IssueState.Queued
+            },
+            async (choice, progress) =>
+            {
+                var ext = Path.GetExtension(fullPath);
+
+                var outputPath = Path.Combine(
+                    Path.GetDirectoryName(fullPath),
+                    $"{Path.GetFileNameWithoutExtension(fullPath)}-nologo{ext}");
+
+                Console.WriteLine($"Delogo-ing {fullPath} to {outputPath}");
+
+                if (FileIO.Exists(outputPath)) FileIO.Delete(outputPath);
+
+                await Ffmpeg([
+                    "-i", fullPath,
+                    "-vf", $"delogo={op.Option}",
+                    "-c:a", "copy", outputPath],
+                    line => progress(0, line));
+            }));
         }
 
         private void CreateParentFolders(string path)

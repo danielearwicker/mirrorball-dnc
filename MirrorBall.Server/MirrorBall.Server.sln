@@ -1,5 +1,4 @@
-
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2017
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MirrorBall.Server", "MirrorBall.Server.csproj", "{A979F478-41EE-4AB0-8076-6BFBA82F9038}"
 EndProject

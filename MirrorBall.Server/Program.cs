@@ -1,21 +1,28 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using MirrorBall.Server;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace MirrorBall.Server
-{
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            var host = new WebHostBuilder()
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
-                .UseStartup<Startup>()
-                .Build();
+var builder = WebApplication.CreateBuilder(args);
 
-            host.Run();
-        }
-    }
-}
+var hostName = System.Net.Dns.GetHostName();
+Console.WriteLine($"Hostname is apparently {hostName}");
+
+var configJson = File.ReadAllText("appsettings.json");
+
+var options = JObject.Parse(configJson)[hostName].ToObject<MirrorOptions>();
+
+Console.WriteLine(JsonConvert.SerializeObject(options, Formatting.Indented));
+
+builder.Services.AddSingleton(Options.Create(options));
+builder.Services.AddControllers();
+
+var app = builder.Build();
+app.UseStaticFiles();
+app.UseAuthorization();
+app.MapDefaultControllerRoute();
+app.Run();

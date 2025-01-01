@@ -6,5 +6,6 @@
         public string PeerServer { get; set; }
         public string OurName { get; set; }
         public string PeerName { get; set; }
+        public string Ffmpeg { get; set; }
     }
 }

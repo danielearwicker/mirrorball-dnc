@@ -55,3 +55,19 @@ function summarise(strings) {
     return [strings];
 }
 exports.summarise = summarise;
+var digits = /^\d+$/;
+var alpha = /^\w+$/;
+function describeSection(strings) {
+    if (strings.every(function (s) { return !s || !!s.match(digits); })) {
+        return "[0-9]";
+    }
+    if (strings.every(function (s) { return !s || !!s.match(alpha); })) {
+        return "[a-z]";
+    }
+    return "[...]";
+}
+exports.describeSection = describeSection;
+function summariseToString(strings) {
+    return summarise(strings).map(function (s) { return s.length == 1 ? s : describeSection(s); }).join("");
+}
+exports.summariseToString = summariseToString;

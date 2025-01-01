@@ -10,5 +10,6 @@
         public double Progress { get; set; }
         public string ProgressText { get; set; }
         public string Choice { get; set; }
+        public string DelogoPath { get; set; }
     }
 }

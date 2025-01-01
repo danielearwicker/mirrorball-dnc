@@ -2,21 +2,23 @@
   "name": "MirrorBall.Client",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "source": "index.html",
   "scripts": {
-    "watch": "webpack -w",
-    "build": "webpack"
+    "start": "parcel",
+    "build": "parcel build --dist-dir ../MirrorBall.Server/wwwroot"
   },
   "keywords": [],
   "author": "Daniel Earwicker <dan@earwicker.com>",
   "license": "MIT",
   "dependencies": {
-    "@types/react": "^15.0.33",
-    "@types/react-dom": "^15.5.1",
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1",
-    "ts-loader": "^2.2.0",
-    "typescript": "^2.4.1",
-    "webpack": "^3.0.0"
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "parcel": "^2.13.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "process": "^0.11.10"
   }
 }
