@@ -46,3 +46,4 @@ Thumbs.db
 .parcel-cache
 **/wwwroot/*.js
 **/wwwroot/*.js.map
+**/wwwroot/index.html

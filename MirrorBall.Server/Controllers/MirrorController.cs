@@ -13,6 +13,7 @@ using System.Net.Http.Headers;
 using System.Diagnostics;
 using FileIO = System.IO.File;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace MirrorBall.Server.Controllers
 {
@@ -251,6 +252,9 @@ namespace MirrorBall.Server.Controllers
         {
             var rightTask = Http.GetStringAsync($"{options.Value.PeerServer}api/mirror/states");
 
+            // To simulate without a peer:
+            //var rightTask = Task.Run(() => "[]");
+
 			var left = Operations.GetStates(options.Value.RootFolder, progress);
 			var right = JsonConvert.DeserializeObject<List<FileState>>(await rightTask);
 
@@ -390,12 +394,12 @@ namespace MirrorBall.Server.Controllers
             RemoveEmptyParentFolders(op.OldName);
         }
 
-        private async Task Ffmpeg(string[] args, Action<string> stdout)
+        private async Task Ffmpeg(string[] args, Action<string> stderr)
         {
             var info = new ProcessStartInfo
             {
                 FileName = options.Value.Ffmpeg,
-                RedirectStandardOutput = true,
+                RedirectStandardError = true,
             };
 
             foreach (var arg in args)
@@ -414,11 +418,11 @@ namespace MirrorBall.Server.Controllers
                 {
                     while (!quitToken.IsCancellationRequested)
                     {
-                        var line = await proc.StandardOutput.ReadLineAsync(quitToken);
+                        var line = await proc.StandardError.ReadLineAsync(quitToken);
                         if (line == null) break;
 
                         line = line.Trim();
-                        if (line != string.Empty) stdout(line);
+                        if (line != string.Empty) stderr(line);
                     }
                 }
                 catch(Exception x)
@@ -463,6 +467,19 @@ namespace MirrorBall.Server.Controllers
             }            
         }
 
+        private static Regex _duration = new Regex(@"Duration:\s(\d\d):(\d\d):(\d\d)\.(\d\d),");
+        private static Regex _time = new Regex(@"\stime=(\d\d):(\d\d):(\d\d)\.(\d\d)\s");
+
+        private int? ParseTimeSpanToSeconds(Regex pattern, string line)
+        {
+            var matches = pattern.Match(line);
+            if (!matches.Success) return null;
+
+            return int.Parse(matches.Groups[1].Value) * 3600 +
+                int.Parse(matches.Groups[2].Value) * 60 +
+                int.Parse(matches.Groups[3].Value);
+        }
+
         [HttpPost("delogo")]
         public void DeLogo([FromBody] DelogoOperation op)
         {
@@ -489,11 +506,29 @@ namespace MirrorBall.Server.Controllers
 
                 if (FileIO.Exists(outputPath)) FileIO.Delete(outputPath);
 
+                var durationSeconds = 0;
+
+                await Ffmpeg(["-i", fullPath], line => 
+                {
+                    var parsed = ParseTimeSpanToSeconds(_duration, line);
+                    if (parsed.HasValue) durationSeconds = parsed.Value;
+                });
+
+                var time = 0;
+
                 await Ffmpeg([
                     "-i", fullPath,
                     "-vf", $"delogo={op.Option}",
                     "-c:a", "copy", outputPath],
-                    line => progress(0, line));
+                    line =>
+                    {
+                        var parsed = ParseTimeSpanToSeconds(_time, line);
+                        if (parsed.HasValue) time = parsed.Value;                            
+
+                        progress(durationSeconds != 0
+                            ? (double)time / durationSeconds 
+                            : 0, line);
+                    });
             }));
         }
 
